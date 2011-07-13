@@ -56,8 +56,8 @@ class PluginRegistry extends \Pyrus\Registry
             return;
         }
 
-        $scanned = true;
-        $parser = new XMLParser;
+        $scanned    = true;
+        $parser     = new XMLParser;
         $schemapath = Main::getDataPath();
         if (!file_exists(Main::getDataPath() . '/channel-1.0.xsd')) {
             $schemapath = realpath(__DIR__ . '/../../data');
@@ -70,7 +70,7 @@ class PluginRegistry extends \Pyrus\Registry
         try {
             foreach (Config::current()->channelregistry as $channel) {
                 foreach ($this->listPackages($channel->name) as $package) {
-                    $chan = $channel->name;
+                    $chan  = $channel->name;
                     $files = $this->info($package, $chan, 'installedfiles');
                     // each package may only have 1 role, task or command
                     foreach ($files as $path => $info) {
@@ -88,6 +88,7 @@ class PluginRegistry extends \Pyrus\Registry
                                 Task\Common::registerCustomTask($taskinfo);
                                 continue 2;
                             case 'customcommand' :
+                                echo "Registering a customcommand from {$path}" . PHP_EOL;
                                 $commands = $parser->parse($path, $commandschema);
                                 $this->addCommand($commands['commands']['command']);
                                 continue 2;
@@ -125,12 +126,23 @@ class PluginRegistry extends \Pyrus\Registry
         }
     }
 
+    /**
+     * Return required info about a command. When no command argument is provided
+     * we'll return the entire {@link self::$commandMap}. When the command is not
+     * found, we'll return 'false'.
+     *
+     * @param mixed $command String, or null.
+     *
+     * @return mixed
+     * @see    self::$commandMap
+     * @see    self::addCommand()
+     */
     static function getCommandInfo($command = null)
     {
         if (null === $command) {
             return self::$commandMap;
         }
-
+var_dump($command, self::$commandMap[$command]); exit;
         if (isset(self::$commandMap[$command])) {
             return self::$commandMap[$command];
         }

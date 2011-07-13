@@ -142,7 +142,6 @@ class PluginRegistry extends \Pyrus\Registry
         if (null === $command) {
             return self::$commandMap;
         }
-var_dump($command, self::$commandMap[$command]); exit;
         if (isset(self::$commandMap[$command])) {
             return self::$commandMap[$command];
         }

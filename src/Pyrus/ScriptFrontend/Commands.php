@@ -277,7 +277,6 @@ class Commands implements \Pyrus\LogInterface
             if ($result->options['paranoid']) {
                 \Pyrus\Main::$paranoid = $result->options['paranoid'];
             }
-
             if ($info = \Pyrus\PluginRegistry::getCommandInfo($result->command_name)) {
                 if ($this instanceof $info['class']) {
                     if ($info['function'] == 'dummyStub' || $info['function'] == 'scsDummyStub') {
@@ -410,8 +409,16 @@ previous:
         echo "Documentation is at http://pear.php.net\n";
     }
 
-    function dummyStub($command)
+    /**
+     * Stub function for the command definition.
+     *
+     * @param \PEAR2\Console\CommandLine\Result $command
+     *
+     * @return mixed
+     */
+    public function dummyStub(\PEAR2\Console\CommandLine\Result $command)
     {
+        // need to figure out a way here to use the local install
         if ('yes' === $this->ask('The "' . $command->command_name .
                                  '" command is in the developer tools.  Install developer tools?',
                     array('yes', 'no'), 'no')) {

@@ -1,0 +1,20 @@
+<?php
+/**
+ * This is an autoloader which comes in handy when you want to run pyrus from
+ * the git repository -- sans phar.
+ *
+ * @author Brett Bieber
+ * @desc   autoload.php
+ */
+
+// load PEAR2\Autoload first
+require_once __DIR__ . '/../PEAR2_Autoload/src/PEAR2/Autoload.php';
+
+// Setup the local source dir
+PEAR2\Autoload::initialize(__DIR__ . '/src');
+
+// Setup the Pyrus_Developer checkout
+PEAR2\Autoload::initialize(__DIR__ . '/../Pyrus_Developer/src');
+
+// Fall back to the local vendor dir
+PEAR2\Autoload::initialize(__DIR__ . '/vendor/php');

@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -77,18 +76,23 @@ class Validator
             $a = $pf->toArray();
             if ($a['package']['attribs']['version'] == '2.1') {
                 $schema = \Pyrus\Main::getDataPath() . '/package-2.1.xsd';
-                // for running out of cvs
-                if (!file_exists($schema)) {
-                    $schema = dirname(dirname(dirname(dirname(__DIR__)))) . '/data/package-2.1.xsd';
-                }
             } else {
                 $schema = \Pyrus\Main::getDataPath() . '/package-2.0.xsd';
-                // for running out of cvs
-                if (!file_exists($schema)) {
-                    $schema = dirname(dirname(dirname(dirname(__DIR__)))) . '/data/package-2.0.xsd';
-                }
             }
-            $dom->schemaValidate($schema);
+
+            // libxml can't process these from within a phar (pity)
+            if (strpos($schema, 'phar://') === 0) {
+                if (!file_exists($temp = \Pyrus\Config::current()->temp_dir . DIRECTORY_SEPARATOR . 'schema')
+                ) {
+                    mkdir($temp, 0755, true);
+                }
+                $tmpschema = $temp . DIRECTORY_SEPARATOR . basename($schema);
+                copy($schema, $tmpschema);
+                $dom->schemaValidate($tmpschema);
+            } else {
+                $dom->schemaValidate($schema);
+            }
+
             $causes = array();
             foreach (libxml_get_errors() as $error) {
                 $this->errors->E_ERROR[] = new \Pyrus\PackageFile\Exception("Line " .

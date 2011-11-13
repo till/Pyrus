@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -59,9 +58,6 @@ class PluginRegistry extends \Pyrus\Registry
         $scanned    = true;
         $parser     = new XMLParser;
         $schemapath = Main::getDataPath();
-        if (!file_exists(Main::getDataPath() . '/channel-1.0.xsd')) {
-            $schemapath = realpath(__DIR__ . '/../../data');
-        }
 
         $roleschema    = $schemapath . '/customrole-2.0.xsd';
         $taskschema    = $schemapath . '/customtask-2.0.xsd';

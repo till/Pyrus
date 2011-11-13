@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -47,8 +46,7 @@ class v1 extends \Pyrus\ChannelFile implements \Pyrus\ChannelFileInterface
             'version' => '1.0',
             'xmlns' => 'http://pear.php.net/channel-1.0',
             'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation' => 'http://pear.php.net/channel-1.0
-http://pear.php.net/dtd/channel-1.0.xsd'
+            'xsi:schemaLocation' => 'http://pear.php.net/channel-1.0 http://pear.php.net/dtd/channel-1.0.xsd'
         );
 
     private $_xml;
@@ -132,10 +130,6 @@ http://pear.php.net/dtd/channel-1.0.xsd'
 
         $a = new \Pyrus\XMLParser;
         $schema = \Pyrus\Main::getDataPath() . '/channel-1.0.xsd';
-        // for running out of svn
-        if (!file_exists($schema)) {
-            $schema = dirname(dirname(dirname(__DIR__))) . '/data/channel-1.0.xsd';
-        }
 
         try {
             $a->parseString($this->_xml, $schema);

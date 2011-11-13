@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -36,7 +35,7 @@ class Xml extends \Pyrus\ChannelFile\v1\Mirror
 
     public function toChannelObject()
     {
-        $chan = new \Pyrus\Channel(new \Pyrus\ChannelFile((string) $this->parentChannel, true));
+        $chan = new \Pyrus\Channel(new \Pyrus\ChannelFile((string) $this->parentChannel));
         return $chan;
     }
 

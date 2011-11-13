@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -111,29 +110,6 @@ abstract class Base implements \Pyrus\PackageInterface
         }
 
         return $this;
-    }
-
-    /**
-     * Sort files/directories for removal
-     *
-     * Files are always removed first, followed by directories in
-     * path order
-     * @param unknown_type $a
-     * @param unknown_type $b
-     * @return unknown
-     */
-    static function sortstuff($a, $b)
-    {
-        // files can be removed in any order
-        if (is_file($a) && is_file($b)) return 0;
-        if (is_dir($a) && is_file($b)) return 1;
-        if (is_dir($b) && is_file($a)) return -1;
-        $countslasha = substr_count($a, DIRECTORY_SEPARATOR);
-        $countslashb = substr_count($b, DIRECTORY_SEPARATOR);
-        if ($countslasha > $countslashb) return -1;
-        if ($countslashb > $countslasha) return 1;
-        // if not subdirectories, tehy can be removed in any order
-        return 0;
     }
 
     /**
@@ -255,13 +231,13 @@ abstract class Base implements \Pyrus\PackageInterface
         return $this->packagefile;
     }
 
-    function getFileContents($file, $asstream = false)
+    function getFileContents($file, $asStream = false)
     {
         if (!isset($this[$file])) {
             throw new Exception('file ' . $file . ' is not in this package');
         }
 
-        if ($asstream) {
+        if ($asStream) {
             $fp = fopen($this->getFilePath($file), 'rb');
             if ($fp === false) {
                 throw new Exception('File ' . $this->getFilePath($file) . ' cannot be found/opened.');

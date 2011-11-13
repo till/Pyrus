@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -43,6 +42,7 @@ class ScriptFrontend extends \PEAR2\Console\CommandLine
             }
         }
 
+        $command->accept($params['renderer']);
         $command->parent                = $this;
         $this->commands[$command->name] = $command;
         return $command;

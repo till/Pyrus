@@ -3,6 +3,9 @@ Features:
  - Add support for installing from a remote package.xml [saltybeagle]
  - Display version and stability in list-packages [saltybeagle]
  - Improve error when phar includes are disabled by suhosin [mfonda]
+ - Replace config-show with allowing people to call the get command without any arguments to achieve the same result.
+   "php pyrus.phar get" and php "pyrus.phar config-show" are the same
+ - Dropped the channel-add command in favor of channel-discover as they were doing the same thing.
 
 Bug Fixes/Refactoring:
 
@@ -11,3 +14,6 @@ Bug Fixes/Refactoring:
  - Packaged license files should use 'filesource' not 'path' [saltybeagle]
  - Removed the PEAR2 namespace and made Pyrus the top level namespace.
    This means all includes and classes need to drop the PEAR2 portion [helgi]
+ - Use the channel name instead of package name when giving the security error of when a package claims
+   to be from channel X but really is Y (pyrus/Pyrus#50) [xc]
+ - DOMDocument::schemaValidate doesn't support phar:// stream [tyrael]

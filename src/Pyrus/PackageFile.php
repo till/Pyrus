@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -35,11 +34,10 @@ class PackageFile implements PackageFileInterface
             return $this->info = $package;
         }
 
-        $this->path = $package;
-        $parser = new PackageFile\Parser\v2;
         if ($isString) {
             $data = $package;
         } else {
+            $this->path = $package;
             $data = file_get_contents($package);
         }
 
@@ -48,6 +46,7 @@ class PackageFile implements PackageFileInterface
                 . $package . ' or file was empty.');
         }
 
+        $parser = new PackageFile\Parser\v2;
         $this->info = $parser->parse($data, $package, $class);
     }
 

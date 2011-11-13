@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -161,7 +160,7 @@ class Remote extends \Pyrus\Package
         if ($internal->channel != $this->channel) {
             throw new Exception('SECURITY ERROR: package is claiming to be from ' .
                                 'channel ' . $internal->channel . ', but we are ' .
-                                'channel ' . $this->name);
+                                'channel ' . $this->channel);
         }
 
         $internal->setFrom($this->internal);
@@ -240,12 +239,10 @@ class Remote extends \Pyrus\Package
                 try {
                     try {
                         $chan = new \Pyrus\Channel(
-                                    new \Pyrus\ChannelFile('https://' . $e->params['channel'] . '/channel.xml',
-                                                                false, true));
+                                    new \Pyrus\ChannelFile('https://' . $e->params['channel'] . '/channel.xml'));
                     } catch (\Exception $e) {
                         $chan = new \Pyrus\Channel(
-                                    new \Pyrus\ChannelFile('http://' . $e->params['channel'] . '/channel.xml',
-                                                                false, true));
+                                    new \Pyrus\ChannelFile('http://' . $e->params['channel'] . '/channel.xml'));
                     }
                 } catch (\Exception $e) {
                     throw new Exception('Cannot auto-discover channel ' . $e->params['channel'], $e);

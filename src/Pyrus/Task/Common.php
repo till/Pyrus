@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 /**
@@ -115,7 +114,7 @@ abstract class Common extends \ArrayObject implements \SplSubject
      * It is also possible to throw multiple validation errors, by using a
      * {@link \PEAR2\MultiErrors} object as a cause parameter to
      * {@link \Pyrus\Task\Exception}.
-     * @param PEAR_Pyrus_PackageFileInterface
+     * @param Pyrus_PackageFileInterface
      * @param array
      * @param array the entire parsed <file> tag
      * @param string the filename of the package.xml
@@ -173,6 +172,7 @@ abstract class Common extends \ArrayObject implements \SplSubject
         foreach (self::$multiple as $class => $tasks) {
             $class::run(self::$multiple[$class]);
         }
+
         self::$multiple[$class] = array();
     }
 
@@ -224,28 +224,31 @@ abstract class Common extends \ArrayObject implements \SplSubject
         if (!count(static::$customtasks)) {
             static::registerBuiltinTasks();
         }
+
         if ($pos = strpos($task, ':')) {
             $task = substr($task, $pos + 1);
         }
+
         if (isset(static::$customtasks[$task])) {
             $test = static::$customtasks[$task]['class'];
             if (class_exists($test, true)) {
                 return $test;
             }
         }
+
         return false;
     }
 
     static function registerBuiltinTasks()
     {
-        static::registerTask(array('name' => 'replace',
-                                         'class' => 'Pyrus\Task\Replace'));
-        static::registerTask(array('name' => 'windowseol',
-                                         'class' => 'Pyrus\Task\Windowseol'));
-        static::registerTask(array('name' => 'unixeol',
-                                         'class' => 'Pyrus\Task\Unixeol'));
-        static::registerTask(array('name' => 'postinstallscript',
-                                         'class' => 'Pyrus\Task\Postinstallscript'));
+        static::registerTask(array('name'  => 'replace',
+                                   'class' => 'Pyrus\Task\Replace'));
+        static::registerTask(array('name'  => 'windowseol',
+                                   'class' => 'Pyrus\Task\Windowseol'));
+        static::registerTask(array('name'  => 'unixeol',
+                                   'class' => 'Pyrus\Task\Unixeol'));
+        static::registerTask(array('name'  => 'postinstallscript',
+                                   'class' => 'Pyrus\Task\Postinstallscript'));
     }
 
     static function registerCustomTask($taskinfo)
@@ -253,10 +256,10 @@ abstract class Common extends \ArrayObject implements \SplSubject
         if (!count(static::$customtasks)) {
             static::registerBuiltinTasks();
         }
-		static::registerTask($taskinfo);
+        static::registerTask($taskinfo);
     }
 
-	protected static function registerTask($taskinfo) {
+    protected static function registerTask($taskinfo) {
         static::$customtasks[$taskinfo['name']] = $taskinfo;
-	}
+    }
 }

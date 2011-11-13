@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -30,9 +29,6 @@ class Customtask extends \Pyrus\Installer\Role\Data
     {
         $parser = new \Pyrus\XMLParser;
         $schemapath = \Pyrus\Main::getDataPath();
-        if (!file_exists(\Pyrus\Main::getDataPath() . '/customtask-2.0.xsd')) {
-            $schemapath = realpath(__DIR__ . '/../../../data');
-        }
         $taskschema = $schemapath . '/customtask-2.0.xsd';
         try {
             $taskinfo = $parser->parse($package->getFilePath($file['attribs']['name']), $taskschema);

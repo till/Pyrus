@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -128,6 +127,8 @@ class ChannelRegistry implements \ArrayAccess, \IteratorAggregate, \Pyrus\Channe
         } catch (\Exception $e) {
             // don't fail on the default channels, these should always exist
             switch ($channel) {
+                case 'pyrus.net' :
+                    return $this->_registries[0]->getPyrusChannel();
                 case 'pear.php.net' :
                     return $this->_registries[0]->getPearChannel();
                 case 'pear2.php.net' :

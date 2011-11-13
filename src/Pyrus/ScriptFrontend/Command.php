@@ -10,7 +10,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -28,6 +27,7 @@
 namespace Pyrus\ScriptFrontend;
 class Command extends \PEAR2\Console\CommandLine\Command
 {
+    public $doc = '';
 
     /**
      * Display the usage help message to the user, but don't exit
@@ -39,6 +39,6 @@ class Command extends \PEAR2\Console\CommandLine\Command
      */
     public function displayUsage($exitCode = 1)
     {
-        echo "\n", $this->renderer->usage();
+        echo "\n", $this->renderer->commandUsage($this->doc);
     }
 }

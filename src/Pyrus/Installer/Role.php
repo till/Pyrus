@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -204,10 +203,6 @@ class Role
         }
 
         $schemapath = \Pyrus\Main::getDataPath() . '/customrole-2.0.xsd';
-        if (!file_exists($schemapath)) {
-            $schemapath = realpath(__DIR__ . '/../../../data/customrole-2.0.xsd');
-        }
-
         while ($entry = readdir($dp)) {
             if ($entry{0} == '.' || substr($entry, -4) != '.xml') {
                 continue;

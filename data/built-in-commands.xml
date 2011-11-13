@@ -53,15 +53,15 @@ php pyrus.phar install http://www.example.com/PackageName-1.2.0.tgz
 
 Examples of an abstract package:
 php pyrus.phar install PackageName
- installs PackageName from the default channel with stability preferred_state
+  installs PackageName from the default channel with stability preferred_state
 php pyrus.phar pear/PackageName
- installs PackageName from the pear.php.net channel with stability preferred_state
+  installs PackageName from the pear.php.net channel with stability preferred_state
 php pyrus.phar install channel://doc.php.net/PackageName
- installs PackageName from the doc.php.net channel with stability preferred_state
+  installs PackageName from the doc.php.net channel with stability preferred_state
 php pyrus.phar install PackageName-beta
- installs PackageName from the default channel, beta or stable stability
+  installs PackageName from the default channel, beta or stable stability
 php pyrus.phar install PackageName-1.2.0
- installs PackageName from the default channel, version 1.2.0</doc>
+  installs PackageName from the default channel, version 1.2.0</doc>
  </command>
  <command>
   <name>upgrade</name>
@@ -110,15 +110,15 @@ php pyrus.phar install http://www.example.com/PackageName-1.2.0.tgz
 
 Examples of an abstract package:
 php pyrus.phar install PackageName
- installs PackageName from the default channel with stability preferred_state
+  installs PackageName from the default channel with stability preferred_state
 php pyrus.phar pear/PackageName
- installs PackageName from the pear.php.net channel with stability preferred_state
+  installs PackageName from the pear.php.net channel with stability preferred_state
 php pyrus.phar install channel://doc.php.net/PackageName
- installs PackageName from the doc.php.net channel with stability preferred_state
+  installs PackageName from the doc.php.net channel with stability preferred_state
 php pyrus.phar install PackageName-beta
- installs PackageName from the default channel, beta or stable stability
+  installs PackageName from the default channel, beta or stable stability
 php pyrus.phar install PackageName-1.2.0
- installs PackageName from the default channel, version 1.2.0</doc>
+  installs PackageName from the default channel, version 1.2.0</doc>
  </command>
  <command>
   <name>uninstall</name>
@@ -148,9 +148,7 @@ php pyrus.phar install PackageName-1.2.0
     <doc>channel/PackageName of packages to uninstall</doc>
    </argument>
   </arguments>
-  <doc>Uninstall a package
-
-Uninstalls packages.
+  <doc>Uninstalls packages from a given setup.
 
 Example:
 php pyrus.phar uninstall PackageName
@@ -329,32 +327,13 @@ to add a new channel.</doc>
   <doc>Discover a new channel.
 
 This command searches for a channel.xml first at a secure and then unsecured http address.
+It can also take full URLs, local paths and raw channel.xml
 
 Examples:
 php pyrus.phar channel-discover pear.example.com
   This tries to locate https://pear.example.com/channel.xml and if that fails,
   http://pear.example.com/channel.xml, and then adds the channel to the registry.
-
-Use channel-add to add a local channel.xml to the registry</doc>
- </command>
- <command>
-  <name>channel-add</name>
-  <class>Pyrus\ScriptFrontend\Commands</class>
-  <function>channelAdd</function>
-  <summary>Add a new channel to the registry</summary>
-  <shortcut>ca</shortcut>
-  <options/>
-  <arguments>
-   <argument>
-    <name>channelfile</name>
-    <multiple>0</multiple>
-    <optional>0</optional>
-    <doc>Path to local channel.xml file</doc>
-   </argument>
-  </arguments>
-  <doc>Add a new channel to the registry.
-
-Use channel-discover to add a remote channel to the registry.</doc>
+</doc>
  </command>
  <command>
   <name>channel-del</name>
@@ -426,26 +405,6 @@ for answers to queries posed by the post-install script, and executes
 based on the answers provided.</doc>
  </command>
  <command>
-  <name>config-show</name>
-  <class>Pyrus\ScriptFrontend\Commands</class>
-  <function>configShow</function>
-  <summary>Show all configuration values</summary>
-  <shortcut>cs</shortcut>
-  <options>
-   <option>
-    <name>plugin</name>
-    <shortopt>p</shortopt>
-    <type><bool/></type>
-    <doc>List plugin configuration only</doc>
-   </option>
-  </options>
-  <arguments/>
-  <doc>List all configuration values.
-
-This lists configuration values, organized by system configuration settings and
-user configuration settings.</doc>
- </command>
- <command>
   <name>set</name>
   <class>Pyrus\ScriptFrontend\Commands</class>
   <function>set</function>
@@ -482,7 +441,7 @@ php pyrus.phar set download_dir /home/blah/downloads</doc>
   <name>get</name>
   <class>Pyrus\ScriptFrontend\Commands</class>
   <function>get</function>
-  <summary>Get a configuration value</summary>
+  <summary>Get configuration value(s). Leave blank for all values</summary>
   <shortcut>get</shortcut>
   <options>
    <option>
@@ -496,11 +455,11 @@ php pyrus.phar set download_dir /home/blah/downloads</doc>
    <argument>
     <name>variable</name>
     <multiple>0</multiple>
-    <optional>0</optional>
+    <optional>1</optional>
     <doc>Configuration variable name.  This can be a system or user variable.</doc>
    </argument>
   </arguments>
-  <doc>Get a configuration variable.
+  <doc>Fetches all configuration variables or a single one.
 
 For example:
 php pyrus.phar get download_dir</doc>
@@ -549,5 +508,22 @@ This is a convenience alias to the set command with my_pear_path.</doc>
    </argument>
   </arguments>
   <doc>Get detailed help on a command.</doc>
+ </command>
+ <command>
+  <name>search</name>
+  <class>Pyrus\ScriptFrontend\Commands</class>
+  <function>search</function>
+  <summary>Search a registry of PEAR channels for packages</summary>
+  <shortcut>s</shortcut>
+  <options/>
+  <arguments>
+   <argument>
+    <name>query</name>
+    <multiple>0</multiple>
+    <optional>0</optional>
+    <doc>Query to search for</doc>
+   </argument>
+  </arguments>
+  <doc>Search for available packages.</doc>
  </command>
 </commands>

@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -27,6 +26,8 @@
  * @link      https://github.com/pyrus/Pyrus
  */
 namespace Pyrus\ScriptFrontend;
+use Pyrus\ScriptFrontend;
+
 class Commands implements \Pyrus\LogInterface
 {
     public $commands = array();
@@ -74,19 +75,12 @@ class Commands implements \Pyrus\LogInterface
             $schemapath = \Pyrus\Main::getDataPath() . '/customcommand-2.0.xsd';
             $defaultcommands = \Pyrus\Main::getDataPath() . '/built-in-commands.xml';
 
+            // Check for a local-developer-commands.xml file
             $localcommands = false;
-
-            if (!file_exists($schemapath)) {
-                // We're running from source
-                $schemapath = realpath(__DIR__ . '/../../../data/customcommand-2.0.xsd');
-                $defaultcommands = realpath(__DIR__ . '/../../../data/built-in-commands.xml');
-
-                // Check for a local-developer-commands.xml file
-                if (file_exists(__DIR__ . '/../../../data/local-developer-commands.xml')) {
-                    $localcommands = realpath(__DIR__ . '/../../../data/local-developer-commands.xml');
-                }
-
+            if (file_exists(\Pyrus\Main::getDataPath() . '/local-developer-commands.xml')) {
+                $localcommands = realpath(\Pyrus\Main::getDataPath() . '/local-developer-commands.xml');
             }
+
 
             $parser = new \Pyrus\XMLParser;
             $commands = $parser->parse($defaultcommands, $schemapath);
@@ -99,18 +93,21 @@ class Commands implements \Pyrus\LogInterface
             }
 
             if ('@PACKAGE_VERSION@' == '@'.'PACKAGE_VERSION@') {
-                $version = '2.0.0a4'; // running from svn
+                $version = '2.0.0a4'; // running from git
             } else {
                 $version = '@PACKAGE_VERSION@';
             }
+
             static::$commandParser = new \Pyrus\ScriptFrontend(array(
                     'version' => $version,
-                    'description' => 'Pyrus, the installer for PEAR2',
+                    'description' => 'Pyrus, the PHP manager',
                     'name' => 'php ' . basename($_SERVER['argv'][0])
                 )
             );
+
             // set up our custom renderer for help options
             static::$commandParser->accept(new \Pyrus\ScriptFrontend\Renderer(static::$commandParser));
+
             // set up command-less options and argument
             static::$commandParser->addOption('verbose', array(
                 'short_name'  => '-v',
@@ -118,15 +115,18 @@ class Commands implements \Pyrus\LogInterface
                 'action'      => 'Counter',
                 'description' => 'increase verbosity'
             ));
+
             static::$commandParser->addOption('paranoid', array(
                 'short_name'  => '-p',
                 'long_name'   => '--paranoid',
                 'action'      => 'Counter',
                 'description' => 'set or increase paranoia level'
             ));
+
             \Pyrus\PluginRegistry::registerFrontend($this);
             \Pyrus\PluginRegistry::addCommand($commands);
         }
+
         $term = getenv('TERM');
         if (function_exists('posix_isatty') && !posix_isatty(1)) {
             // output is being redirected to a file or through a pipe
@@ -146,12 +146,15 @@ class Commands implements \Pyrus\LogInterface
         $command = static::$commandParser->addCommand($commandinfo['name'], array(
             'description' => $commandinfo['summary'],
             'aliases' => array($commandinfo['shortcut']),
+            'renderer' => new \Pyrus\ScriptFrontend\Renderer,
         ));
+
         if (isset($commandinfo['options']['option'])) {
             $options = $commandinfo['options']['option'];
             if (!isset($options[0])) {
                 $options = array($options);
             }
+
             foreach ($options as $option) {
                 switch (key($option['type'])) {
                     case 'bool' :
@@ -183,18 +186,22 @@ class Commands implements \Pyrus\LogInterface
                         settype($choice, 'array');
                         break;
                 }
+
                 $info = array(
                     'short_name' => empty($option['shortopt']) ? null : '-' . $option['shortopt'],
                     'long_name' => empty($option['name']) ? null : '--' . $option['name'],
                     'description' => $option['doc'],
                     'action' => $action,
                 );
+
                 if ($action == 'Callback') {
                     $info['callback'] = $callback;
                 }
+
                 if (isset($option['default'])) {
                     $info['default'] = $option['default'];
                 }
+
                 if (isset($choice)) {
                     $info['choices'] = $choice;
                     $choice = null;
@@ -209,11 +216,13 @@ class Commands implements \Pyrus\LogInterface
                 }
             }
         }
+
         if (isset($commandinfo['arguments']['argument'])) {
             $args = $commandinfo['arguments']['argument'];
             if (!isset($args[0])) {
                 $args = array($args);
             }
+
             foreach ($args as $arg) {
                 $command->addArgument($arg['name'], array(
                     'description' => $arg['doc'],
@@ -237,10 +246,7 @@ class Commands implements \Pyrus\LogInterface
     {
         $schemapath = \Pyrus\Main::getDataPath() . '/customcommand-2.0.xsd';
         $defaultcommands = \Pyrus\Main::getDataPath() . '/' . $type . 'commands.xml';
-        if (!file_exists($schemapath)) {
-            $schemapath = realpath(__DIR__ . '/../../../data/customcommand-2.0.xsd');
-            $defaultcommands = realpath(__DIR__ . '/../../../data/' . $type . 'commands.xml');
-        }
+
         $parser = new \Pyrus\XMLParser;
         $commands = $parser->parse($defaultcommands, $schemapath);
         $commands = $commands['commands']['command'];
@@ -252,7 +258,7 @@ class Commands implements \Pyrus\LogInterface
      * correct command/method.
      *
      * <code>
-     * $cli = \Pyrus\ScriptFrontend\Commands();
+     * $cli = \Pyrus\ScriptFrontend\Commands;
      * $cli->run($args = array (0 => 'install',
      *                          1 => 'PEAR2/Pyrus_Developer/package.xml'));
      * </code>
@@ -439,7 +445,7 @@ previous:
         if ('yes' === $this->ask('The "' . $command->command_name .
                                  '" command is in the developer tools.  Install developer tools?',
                     array('yes', 'no'), 'no')) {
-            return $this->upgrade(array('package' => array('pear2.php.net/PEAR2_Pyrus_Developer-alpha')),
+            return $this->upgrade(array('package' => array('pyrus.net/Pyrus_Developer-alpha')),
                            array('plugin' => true, 'force' => false, 'optionaldeps' => false));
         }
     }
@@ -450,9 +456,33 @@ previous:
                                  '" command is in the simple channel server tools.  ' .
                                  'Install simple channel server tools?',
                     array('yes', 'no'), 'no')) {
-            return $this->upgrade(array('package' => array('pear2.php.net/PEAR2_SimpleChannelServer-alpha')),
+            return $this->upgrade(array('package' => array('pyrus.net/Pyrus_SimpleChannelServer-alpha')),
                            array('plugin' => true, 'force' => false, 'optionaldeps' => false));
         }
+    }
+
+    /**
+     * Search for known packages matching a query
+     *
+     * @param array $args Array of command line arguments
+     */
+    function search($args)
+    {
+        echo 'Searching for '.$args['query'].PHP_EOL;
+
+        $search = new Commands\Search();
+        $results = $search->query($args['query']);
+
+        if (false === $results) {
+            echo 'No results found.'.PHP_EOL;
+            return;
+        }
+
+        echo count($results) . ' packages found:'.PHP_EOL;
+        foreach ($results as $name=>$result) {
+            echo $name.PHP_EOL;
+        }
+        echo PHP_EOL.'For information on a specific package, type: pyrus info channel/PackageName'.PHP_EOL;
     }
 
     /**
@@ -477,7 +507,7 @@ previous:
                                                      '" command is in the developer tools.  Install developer tools?',
                                         array('yes', 'no'), 'no')) {
                                 return $this->upgrade(array('package' =>
-                                                            array('pear2.php.net/PEAR2_Pyrus_Developer-alpha')),
+                                                            array('pear2.php.net/Pyrus_Developer-alpha')),
                                                array('plugin' => true, 'force' => false, 'optionaldeps' => false));
                             }
                         default :
@@ -487,8 +517,8 @@ previous:
                 echo "Unknown command: $args[command]\n";
                 static::$commandParser->displayUsage();
             } else {
-                static::$commandParser->commands[$args['command']]->displayUsage();
-                echo "\n", $info['doc'], "\n";
+                static::$commandParser->commands[$args['command']]->doc = $info['doc'];
+                static::$commandParser->commands[$args['command']]->displayUsage(false);
             }
         }
     }
@@ -695,6 +725,7 @@ previous:
             $packages = array();
             foreach ($c as $channel) {
                 \Pyrus\Config::current()->default_channel = $channel->name;
+                $packages[$channel->name] = array();
                 foreach ($p->package as $package) {
                     $packages[$channel->name][$package->name] = $package;
                 }
@@ -702,6 +733,10 @@ previous:
             asort($packages);
             foreach ($packages as $channel => $channel_packages) {
                 echo "[channel $channel]:\n";
+                if (!count($channel_packages)) {
+                    echo '(no packages installed in channel ' . $channel . ')' . PHP_EOL;
+                    continue;
+                }
                 ksort($channel_packages);
                 foreach ($channel_packages as $package) {
                     $data = array($package->name,
@@ -743,15 +778,17 @@ previous:
     }
 
     /**
-     * remotely connect to a channel server and grab the channel information,
-     * then add it to the current pyrus managed repo
+     * This command can remotely connect to a channel server and grab the
+     * channel information then add it to the current pyrus managed repo.
+     * Also work from local paths, raw channel.xml and full URLs
      *
-     * @param array $args $args[0] should be the channel name, eg:pear.unl.edu
+     * @param array $args $args[0] can be a channel name (eg:pear.unl.edu),
+     *                    full url and local path
      */
     function channelDiscover($args)
     {
         try {
-            $channel = new \Pyrus\ChannelFile($args['channel'], false, true);
+            $channel = new \Pyrus\ChannelFile($args['channel']);
         } catch (\Exception $e) {
             echo "Discovery of channel ", $args['channel'], " failed: ", $e->getMessage(), "\n";
             return;
@@ -760,19 +797,6 @@ previous:
         $chan = new \Pyrus\Channel($channel);
         \Pyrus\Config::current()->channelregistry->add($chan);
         echo "Discovery of channel ", $chan->name, " successful\n";
-    }
-
-    /**
-     * add a channel to the current pyrus managed path using the raw channel.xml
-     *
-     * @param array $args $args[0] should be the channel.xml filename
-     */
-    function channelAdd($args)
-    {
-        echo "Adding channel from channel.xml:\n";
-        $chan = new \Pyrus\Channel(new \Pyrus\ChannelFile($args['channelfile']));
-        \Pyrus\Config::current()->channelregistry->add($chan);
-        echo "Adding channel ", $chan->name, " successful\n";
     }
 
     function channelDel($args)
@@ -831,7 +855,7 @@ previous:
      * Display pyrus configuration vars
      *
      */
-    function configShow($args, $options)
+    protected function configShow($args, $options)
     {
         $conf = $current = \Pyrus\Config::current();
         if ($options['plugin']) {
@@ -871,17 +895,25 @@ previous:
      */
     function get($args, $options)
     {
+        if (empty($args['variable'])) {
+            return $this->configShow($args, $options);
+        }
+
         $conf = $current = \Pyrus\Config::current();
         if ($options['plugin']) {
             $conf = \Pyrus\Config::singleton(\Pyrus\Config::current()->plugins_dir);
         }
-        if (in_array($args['variable'], $conf->uservars)
-            || in_array($args['variable'], $conf->systemvars)) {
+
+        if (
+            in_array($args['variable'], $conf->uservars)
+            || in_array($args['variable'], $conf->systemvars)
+        ) {
             echo $conf->{$args['variable']} . PHP_EOL;
         } else {
             echo "Unknown config variable: $args[variable]\n";
             exit(1);
         }
+
         if ($options['plugin']) {
             \Pyrus\Config::setCurrent($current->path);
         }

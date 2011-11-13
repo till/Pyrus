@@ -11,12 +11,11 @@
  * through the world-wide-web at the following URI:
  * http://opensource.org/licenses/mit-license.php
  *
- * @category  Console 
+ * @category  Console
  * @package   PEAR2_Console_CommandLine
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
- * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   SVN: $Id$
+ * @license   http://opensource.org/licenses/mit-license.php MIT License
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  */
@@ -28,7 +27,7 @@
  * @package   PEAR2_Console_CommandLine
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
- * @license   http://opensource.org/licenses/mit-license.php MIT License 
+ * @license   http://opensource.org/licenses/mit-license.php MIT License
  * @version   Release: @package_version@
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
@@ -46,16 +45,26 @@ class Renderer extends \PEAR2\Console\CommandLine\Renderer_Default
     {
         $usage = $this->parser->message_provider->get('USAGE_WORD') . ":\n";
         $ret   = $usage . '  ' . $this->name();
+
         if (count($this->parser->options) > 0) {
-            $ret .= ' [/path/to/pear] [' 
+            $ret .= ' [/path/to/pyrus] ['
                 . strtolower($this->parser->message_provider->get('OPTION_WORD'))
                 . ']';
         }
+
         if (count($this->parser->args) > 0) {
             foreach ($this->parser->args as $name=>$arg) {
-                $ret .= ' <' . $arg->help_name . ($arg->multiple?'...':'') . '>';
+                $arg_str = $arg->help_name;
+                if ($arg->multiple) {
+                    $arg_str .= '1 ' . $arg->help_name . '2 ...';
+                }
+                if ($arg->optional) {
+                    $arg_str = '[' . $arg_str . ']';
+                }
+                $ret .= ' ' . $arg_str;
             }
         }
+
         return $this->columnWrap($ret, 2);
     }
 
@@ -70,14 +79,105 @@ class Renderer extends \PEAR2\Console\CommandLine\Renderer_Default
         if (count($this->parser->commands) == 0) {
             return '';
         }
+
         $ret = '  ' . $this->name();
         if (count($this->parser->options) > 0) {
-            $ret .= ' [/path/to/pear] [' 
+            $ret .= ' [/path/to/pyrus] ['
                 . strtolower($this->parser->message_provider->get('OPTION_WORD'))
                 . ']';
         }
+
         //XXX
         $ret .= " <command> [options] [args]";
         return $this->columnWrap($ret, 2);
+    }
+
+    /**
+     * Render the command list that will be displayed to the user, you can
+     * override this method if you want to change the look of the list.
+     *
+     * @return string The formatted subcommand list
+     */
+    protected function commandList()
+    {
+
+        $commands = array();
+        $col      = 0;
+        foreach ($this->parser->commands as $cmdname=>$command) {
+            $cmdname    = '  ' . $cmdname;
+            $commands[] = array($cmdname, $command->description, $command->aliases);
+            $ln         = strlen($cmdname);
+            if ($col < $ln) {
+                $col = $ln;
+            }
+        }
+
+        $ret = $this->parser->message_provider->get('COMMAND_WORD') . ":";
+        foreach ($commands as $command) {
+            $text = str_pad($command[0], $col) . '  ' . $command[1];
+            $ret .= "\n" . $this->columnWrap($text, $col+2);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Returns the full usage message for a given command.
+     *
+     * @return string The usage message
+     */
+    public function commandUsage($doc)
+    {
+        $ret = $this->parser->name;
+        if (!empty($this->parser->aliases)) {
+          $ret .= ' (' . implode(', ', $this->parser->aliases) . ')';
+        }
+        $ret .= ': ' . $this->description() . "\n";
+
+        $ret .= $this->usageLine() . "\n";
+
+        if (!empty($doc)) {
+          $ret .= $this->columnWrap("\n" . $doc, 2) . "\n";
+        }
+
+        if (count($this->parser->options) > 0) {
+            $ret .= "\n" . $this->optionList() . "\n";
+        }
+
+        if (count($this->parser->args) > 0) {
+            $ret .= "\n" . $this->argumentList() . "\n";
+        }
+
+        $ret .= "\n";
+        return $ret;
+    }
+
+    /**
+     * Wraps the text passed to the method at the specified width.
+     *
+     * @param string $text The text to wrap
+     * @param int    $cw   The wrap width
+     *
+     * @return string The wrapped text
+     */
+    protected function columnWrap($text, $cw)
+    {
+        $tokens = explode("\n", $this->wrap($text));
+        $ret    = $tokens[0];
+        $text   = trim(substr($text, strlen($ret)));
+        if (empty($text)) {
+            return $ret;
+        }
+
+        $chunks = $this->wrap($text, $this->line_width - $cw);
+        $tokens = explode("\n", $chunks);
+        foreach ($tokens as $token) {
+            if (!empty($token)) {
+                $ret .= "\n" . str_repeat(' ', $cw) . $token;
+            } else {
+                $ret .= "\n";
+            }
+        }
+        return $ret;
     }
 }

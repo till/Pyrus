@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -199,25 +198,20 @@ class RemotePackage extends \Pyrus\PackageFile\v2 implements \ArrayAccess, \Iter
         }
 
         $d = \Pyrus\Main::getDataPath() . DIRECTORY_SEPARATOR . 'x509rootcerts';
-        // for running out of svn
-        if (!file_exists($d)) {
-            $d = realpath(__DIR__ . '/../../../data/x509rootcerts');
-        } else {
-            if (strpos($d, 'phar://') === 0) {
-                if (!file_exists($temp = Config::current()->temp_dir .
-                                 DIRECTORY_SEPARATOR . 'x509rootcerts')
-                ) {
-                    mkdir($temp, 0755, true);
-                }
-
-                // openssl can't process these from within a phar (pity)
-                foreach (static::$authorities as $i => $authority) {
-                    copy($d . DIRECTORY_SEPARATOR . $authority, $temp . DIRECTORY_SEPARATOR . $authority);
-                    $authorities[$i] = $temp . DIRECTORY_SEPARATOR . $authority;
-                }
-
-                return $authorities;
+        if (strpos($d, 'phar://') === 0) {
+            if (!file_exists($temp = Config::current()->temp_dir .
+                             DIRECTORY_SEPARATOR . 'x509rootcerts')
+            ) {
+                mkdir($temp, 0755, true);
             }
+
+            // openssl can't process these from within a phar (pity)
+            foreach (static::$authorities as $i => $authority) {
+                copy($d . DIRECTORY_SEPARATOR . $authority, $temp . DIRECTORY_SEPARATOR . $authority);
+                $authorities[$i] = $temp . DIRECTORY_SEPARATOR . $authority;
+            }
+
+            return $authorities;
         }
 
         $authorities = static::$authorities;
@@ -268,7 +262,7 @@ class RemotePackage extends \Pyrus\PackageFile\v2 implements \ArrayAccess, \Iter
 
     /**
      * Get the latest version of the package
-     * 
+     *
      * @return RemotePackage
      */
     function getLatestVersion()
@@ -417,17 +411,6 @@ class RemotePackage extends \Pyrus\PackageFile\v2 implements \ArrayAccess, \Iter
                 }
 
                 $ret = new \Pyrus\Package\Remote($url . $ext);
-                if ($certdownloaded) {
-                    if ($ext == '.tar' || $ext == '.tgz') {
-                        if (phpversion() == '5.3.0') {
-                            Logger::log(0, 'WARNING: ' . $url . $ext . ' may not be installable ' .
-                                                                    'with PHP version 5.3.0, the PHP extension phar ' .
-                                                                    'has a bug verifying openssl signatures for ' .
-                                                                    'tar and tgz files.  Either upgrade to PHP 5.3.1 ' .
-                                                                    'or install the .zip version');
-                        }
-                    }
-                }
                 return $ret;
             } catch (\Pyrus\HTTPException $e) {
                 if ($certdownloaded && file_exists($pubkey)) {

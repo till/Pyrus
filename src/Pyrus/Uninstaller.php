@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -223,8 +222,7 @@ class Uninstaller
 
         $configpaths = array();
         foreach (Installer\Role::getValidRoles($package->getPackageType()) as $role) {
-            // set up a list of file role => configuration variable
-            // for storing in the registry
+            // set up a list of file role => configuration variable for storing in the registry
             $roleobj = Installer\Role::factory($package->getPackageType(), $role);
             $configpaths[$role] = $config->{$roleobj->getLocationConfig()};
         }

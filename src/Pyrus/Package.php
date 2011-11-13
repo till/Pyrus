@@ -9,7 +9,6 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2010 The PEAR Group
  * @license   http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @version   SVN: $Id$
  * @link      https://github.com/pyrus/Pyrus
  */
 
@@ -226,7 +225,7 @@ class Package implements \Pyrus\PackageInterface
                 $info = pathinfo($package);
                 if (!isset($info['extension']) || !strlen($info['extension'])) {
                     // guess based on first 5 characters
-                    $f = @fopen($package, 'r');
+                    $f = @fopen($package, 'rb');
                     if ($f) {
                         $first5 = fread($f, 5);
                         fclose($f);
